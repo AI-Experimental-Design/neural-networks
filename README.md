@@ -31,12 +31,15 @@ pdftoppm \
 
 </details>
 
-- Input
-- Weight
+- Inputs ($x_1 \dots x_m$) The raw numerical features fed into the network
+  representing the initial data points (e.g., pixel intensities, house square
+  footage, or word embeddings). They form the input layer and pass forward
+  through the connections without modifications of their own.
+- Weights
 - Aggregation
 - Bias
 - Activation funcitons
-- Output
+- Outputs
 
 
 
