@@ -1,6 +1,23 @@
 # Neural Networks
 
-## Architecutre
+Neural networks are a computing model inspired by biology that learns patterns
+directly from data. They can recognize complex non-linear relationships and are
+widely used in computer vision, natural language processing, speech
+recognition, and predictive analytics.
+
+A neural network is organized into layers of interconnected processing units
+that pass information forward from input to output. The architecture begins
+with an input layer that takes raw feature data. This data is transformed
+through one or more hidden layers to extract progressively complex patterns
+before reaching a final output layer that produces the prediction.
+
+Individual units within these layers are digital neurons. Every digital neuron
+independently receives inputs from the preceding layer, multiplies them by its
+weights, adds a bias, runs the total through an activation function, and
+broadcasts its output forward to the neurons in the next layer. The network
+learns these parameters through training, where large amounts of data are
+passed through the network and individual weights and biases are updated based
+on how close the prediction is to the target answer.
 
 | Neural netowrk | Digital neuron |
 |-|-|
