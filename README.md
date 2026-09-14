@@ -50,7 +50,8 @@ pdftoppm \
     learning complex, real-world relationships. Common
     choices include:
       - ReLU: Zeroes out negative inputs to introduce non-linearity efficiently
-        and encourage sparsity.  <img src="img/act_relu.png" style="height: 1in;">
+        and encourage sparsity.
+        <img src="img/act_relu.png" style="height: 1in;">
         <details>
 
         ```bash
@@ -68,8 +69,46 @@ pdftoppm \
         </details>
       - Sigmoid: Squashes values into a range between $0$ and $1$, making it
         ideal for binary probabilities.
+        <img src="img/act_sigmoid.png" style="height: 1in;">
+        <details>
+
+        ```bash
+        python3 -c "
+            import numpy as np
+            x = np.linspace(-6, 6, 200)
+            y = 1/(1+np.exp(-x))
+            for xi, yi in zip(x, y): print(xi, yi)
+        " \
+        | python3 src/plot_line.py \
+            -o img/act_sigmoid.png \
+            --width 1 \
+            --height 1 \
+            --line_style "-"
+        ```
+
+        </details>
+
       - Tanh: Maps values between $-1$ and $1$, providing zero-centered outputs
         for smoother training.
+        <img src="img/act_tanh.png" style="height: 1in;">
+        <details>
+
+        ```bash
+        python3 -c "
+            import numpy as np
+            x = np.linspace(-6, 6, 200)
+            y = np.tanh(x)
+            for xi, yi in zip(x, y): print(xi, yi)
+        " \
+        | python3 src/plot_line.py \
+            -o img/act_tanh.png \
+            --width 1 \
+            --height 1 \
+            --line_style "-"
+        ```
+
+        </details>
+
   - Output: The final scalar output signal produced by the neuron after
     activation. This value serves as the single prediction for binary models or
     is broadcast forward as an input to downstream digital neurons in a
