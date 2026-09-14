@@ -31,15 +31,49 @@ pdftoppm \
 
 </details>
 
-- Inputs ($x_1 \dots x_m$) The raw numerical features fed into the network
-  representing the initial data points (e.g., pixel intensities, house square
-  footage, or word embeddings). They form the input layer and pass forward
-  through the connections without modifications of their own.
-- Weights
-- Aggregation
-- Bias
-- Activation funcitons
-- Outputs
+- Digital neuron
+  - Inputs ($x_1 \dots x_m$): Numerical feature signals fed directly into the
+    neuron from external data or upstream neurons.
+  - Weights ($w_{k1} \dots w_{km}$): Adjustable numerical coefficients assigned
+    to every incoming connection that dictate the strength and influence of
+    each input signal. During training, the network updates these parameters to
+    learn which features matter most for accurate predictions.
+  - Aggregation ($\sum$): Each input value is multiplied by its corresponding
+    weight and summed together. This collects all incoming weighted signals
+    into a single scalar value.
+  - Bias: A learnable constant value added to the aggregated weighted sum. It
+    acts as an offset, allowing the activation function to shift left or right
+    along the axis so the neuron can fit data patterns that do not pass through
+    the origin.
+  - Activation funciton ($\varphi$): Mathematical functions applied to the
+    aggregated sum and bias to introduce non-linearity, which is essential for
+    learning complex, real-world relationships. Common
+    choices include:
+      - ReLU: Zeroes out negative inputs to introduce non-linearity efficiently
+        and encourage sparsity.  <img src="img/act_relu.png" style="height: 1in;">
+        <details>
+
+        ```bash
+        python3 -c "
+            import numpy as np
+            x = np.linspace(-6, 6, 200)
+            y = np.maximum(x, 0)
+            for xi, yi in zip(x, y): print(xi, yi)
+        " | python3 src/plot_line.py \
+            -o img/act_relu.png \
+            --width 1 \
+            --height 1 --line_style "-"
+        ```
+
+        </details>
+      - Sigmoid: Squashes values into a range between $0$ and $1$, making it
+        ideal for binary probabilities.
+      - Tanh: Maps values between $-1$ and $1$, providing zero-centered outputs
+        for smoother training.
+  - Output: The final scalar output signal produced by the neuron after
+    activation. This value serves as the single prediction for binary models or
+    is broadcast forward as an input to downstream digital neurons in a
+    network.
 
 
 
