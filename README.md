@@ -133,6 +133,7 @@ pdftoppm \
 
 
 
+# Train
 
 ## Gernate interval data file
 
@@ -141,7 +142,9 @@ We are going to use a complete sytetic dataset
 Goign to try and find the start and end of an interval
 This could be the effective dosage range for some treament
 
-<img src="img/interval.data.png" style="height: 2in;">
+| Architecture | Data set|
+|-|-|
+| <img src="img/cartoons/interval_nn-1.png" style="height: 2in;"> | <img src="img/interval.data.png" style="height: 2in;"> | 
 
 <details>
 
@@ -158,15 +161,33 @@ tail -n +2 out/interval.data.tsv \
     --point_size 4 \
     --markeredgecolor "tab:blue" \
     --markerfacecolor "tab:blue"
+
+pdflatex \
+    -output-directory=img/cartoons \
+    img/cartoons/interval_nn.tex
+
+pdftoppm \
+    -png \
+    -r 150 \
+    img/cartoons/interval_nn.pdf \
+    img/cartoons/interval_nn
+
 ```
 
 </details>
 
 
-## Train
+## Training
+
+- parameters
+- loss
+- epoch
+- acc
 
 ```bash
 python src/train_interval_nn.py \
     --data out/interval.data.tsv \
     --out_prefix out/interval
+
+epoch 0400 loss=0.0419 acc=1.000 h1_w=+3.246 h1_b=-12.963 h2_w=-4.748 h2_b=+9.216 out_v1=-12.481 out_v2=-12.286 out_b=+5.840
 ```
