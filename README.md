@@ -155,7 +155,7 @@ biases) to improve accuracy.
   While loss is for the model during training, Accuracy is for 
   human evaluation.
 
-## Example
+### Example
 
 Here we will use a synthetic dataset designed to model an interval-finding
 problem. While this prblem could corresopnd to identifying the effective dosage
@@ -196,7 +196,7 @@ pdftoppm \
 
 </details>
  
-### Architecture
+#### Architecture
 - Input Layer: 1 input feature representing the $x$ valyue
 - Hidden Layer: 2 digital neurons that  pass their output through a Sigmoid
   activation function. Since a single neuron can only draw one decision
@@ -206,27 +206,64 @@ pdftoppm \
   single score (logit) which is then transfomred by a Sigmoid to yield the
   probability of $x$ being in the interval.
 - Parameters: 7 total scalar parameters
-    - 2 Hidden Weights: Weights mapping the single input $x$ to the 2 hidden
-      neurons.
-    - 2 Hidden Biases: Biases shifting the threshold points of hidden neurons 1
-      and 2 along the number line.
-    - 2 Output Weights: Weights that control how teh influence each hidden
-      neuron's activation has on the final score.
-    - 1 Output Bias: The baseline offset for the final classification layer.
+    - 2 Hidden Weights (`h1_w` and `h2_w`): Weights mapping the single input
+      $x$ to the 2 hidden neurons.
+    - 2 Hidden Biases (`h1_b` and `h2_b`): Biases shifting the threshold points
+      of hidden neurons 1 and 2 along the number line.
+    - 2 Output Weights (`out_v1` and `out_v2`): Weights that control how teh
+      influence each hidden neuron's activation has on the final score.
+    - 1 Output Bias (`out_b`): The baseline offset for the final classification
+      layer.
 
-## Training metris
-- Loss: Binary Cross-Entropy Loss evaluates the error between the model's
-  predicted probability (P(x in interval)) and the 0 or 1 ground truth.
-- Epoch: A single cycle from epoch 1 to 400. At designated snapshot epochs ([1,
-  5, 15, 30, 60, 120, 200, 400]), the script logs the values of all 7
-  parameters alongside loss and accuracy to track how the network learns over
-  time.
+### Training metris
+- Loss: How far off the predictions are from the true targets. Here we use
+   Binary Cross-Entropy Loss. Binary indicates a 2-class classification problem
+   (in interval or not), and Cross-Entropy is a family of loss functions that
+   measures the difference between 0/1 labels and predicted probabilities,
+   heavily penalizing confident wrong predictions.
+- Epoch: One of the 400 cycles where the complete training dataset is passed
+  through the model, loss is calculated, and parameters are adjusted.
 - Accuracy (acc): The proportion of samples correctly identified as inside or
   outside the target interval.
+
+
+Over 400 epochs, the model shifts from stagnation to strong convergence. For
+the first 120 epochs, the model makes minimal progress with accuracy staying
+flat at 0.68 while loss drops slowly from 0.634 to 0.491.  Between epochs 130
+and 180, training accelerates with loss dropping from 0.402 to 0.129 and 
+accuracy rising from 0.865 to a 1.0. Across the final 220 epochs, accuracy
+remains at 1.000 while the loss drops down to 0.041.
+
+<img src="out/interval_training.png" style="height: 2in;">
+
+<details>
 
 ```bash
 python src/train_interval_nn.py \
     --data out/interval.data.tsv \
+    --snapshot_every 10 \
     --out_prefix out/interval
+
 epoch 0400 loss=0.0419 acc=1.000 h1_w=+3.246 h1_b=-12.963 h2_w=-4.748 h2_b=+9.216 out_v1=-12.481 out_v2=-12.286 out_b=+5.840
+wrote out/interval.params.tsv
+
+python src/plot_interval_training.py \
+    -i out/interval.params.tsv \
+    -o out/interval_training.png \
+    --title "TinyIntervalNet traing"
 ```
+
+</details>
+
+## Infrence
+
+```bash
+python src/interval_nn_inference.py \
+    --h_w 3.246 -4.748 \
+    --h_b -12.963 9.216 \
+    --out_v -12.481 -12.286 \
+    --out_b 5.840 \
+    --x 0.5 1.9 2.1 3.0 3.9 4.1 5.5
+```
+
+## Train 
