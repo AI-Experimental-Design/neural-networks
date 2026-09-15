@@ -132,15 +132,35 @@ pdftoppm \
     network.
 
 
+## Supervised Training
 
-# Train
+Training a neural network is an iterative process where the model learns by
+sending its training data, which it knows the answers to, through the network
+to generate predictions. We then measures how far off those predictions are
+from the anwers, and use that error to update the model parametes (weights and
+biases) to improve accuracy. 
 
-## Gernate interval data file
+### Training Parameters & Metrics
+- Parameters: The weights and biases that the model modifies during training.
+  The goal of training is to find values for those parameters that maximizes
+  accuracy.
+- Loss: A score produced by some cost function that quantifies the difference
+  between the current prediction and the answers. A lower loss indicates a
+  better-performing model. Loss is the primary signal the model uses to
+  adjust its parameters.
+- Epoch: One complete pass of the entire training dataset through the network.
+  Training typically runs over multiple epochs as the model improves its
+  predictions.
+- Accuracy: The percentage of total predictions that the model got correct.
+  While loss is for the model during training, Accuracy is for 
+  human evaluation.
 
-A NN can fit a curve to almost any dataset
-We are going to use a complete sytetic dataset 
-Goign to try and find the start and end of an interval
-This could be the effective dosage range for some treament
+## Example
+
+Here we will use a synthetic dataset designed to model an interval-finding
+problem. While this prblem could corresopnd to identifying the effective dosage
+range for a drug treatment it is a deliberately simple task so we better track
+the training process.
 
 | Architecture | Data set|
 |-|-|
@@ -175,19 +195,38 @@ pdftoppm \
 ```
 
 </details>
+ 
+### Architecture
+- Input Layer: 1 input feature representing the $x$ valyue
+- Hidden Layer: 2 digital neurons that  pass their output through a Sigmoid
+  activation function. Since a single neuron can only draw one decision
+  boundary (e.g., $x>2$), we need two too form the two boundaries ($x>2$ and
+  $x<4$) that are required to respreset an interval.
+- Output Layer: Combines the activation signals from the hidden neurons into a
+  single score (logit) which is then transfomred by a Sigmoid to yield the
+  probability of $x$ being in the interval.
+- Parameters: 7 total scalar parameters
+    - 2 Hidden Weights: Weights mapping the single input $x$ to the 2 hidden
+      neurons.
+    - 2 Hidden Biases: Biases shifting the threshold points of hidden neurons 1
+      and 2 along the number line.
+    - 2 Output Weights: Weights that control how teh influence each hidden
+      neuron's activation has on the final score.
+    - 1 Output Bias: The baseline offset for the final classification layer.
 
-
-## Training
-
-- parameters
-- loss
-- epoch
-- acc
+## Training metris
+- Loss: Binary Cross-Entropy Loss evaluates the error between the model's
+  predicted probability (P(x in interval)) and the 0 or 1 ground truth.
+- Epoch: A single cycle from epoch 1 to 400. At designated snapshot epochs ([1,
+  5, 15, 30, 60, 120, 200, 400]), the script logs the values of all 7
+  parameters alongside loss and accuracy to track how the network learns over
+  time.
+- Accuracy (acc): The proportion of samples correctly identified as inside or
+  outside the target interval.
 
 ```bash
 python src/train_interval_nn.py \
     --data out/interval.data.tsv \
     --out_prefix out/interval
-
 epoch 0400 loss=0.0419 acc=1.000 h1_w=+3.246 h1_b=-12.963 h2_w=-4.748 h2_b=+9.216 out_v1=-12.481 out_v2=-12.286 out_b=+5.840
 ```
