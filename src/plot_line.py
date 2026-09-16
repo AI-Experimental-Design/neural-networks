@@ -82,6 +82,7 @@ def main():
     if args.trend:
         z = np.polyfit(X, Y, 1)
         p = np.poly1d(z)
+        print(p)
         ax.plot(X, p(X), '--', color='black')
 
     plot_helper.format_ax(ax, args)

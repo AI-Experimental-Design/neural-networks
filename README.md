@@ -329,6 +329,11 @@ done
 ```
 </details>
 
+## Reading
+
+- Mayr, A., Klambauer, G., Unterthiner, T., & Hochreiter, S. (2016). DeepTox: Toxicity prediction using deep learning. *Frontiers in Environmental Science*, *3*, 80. (Plain feedforward deep network, not a CNN, same architecture family as the interval classifier, just deeper.) https://doi.org/10.3389/fenvs.2015.00080
+
+
 # Questions
 
 1. Train this network with one, two, and three nodes in the hidden layer on the
