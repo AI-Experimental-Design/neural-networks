@@ -328,3 +328,63 @@ for epoch in 10 100  200 300; do
 done
 ```
 </details>
+
+# Questions
+
+1. Train this network with one, two, and three nodes in the hidden layer on the
+   same interval dataset. What happend? Why? What does that tell you about what
+   a 1, 2, and 3 neurons can and can't represent?
+   
+   ```bash
+   python src/train_interval_nn.py \
+     --data out/interval.data.tsv \
+     --hidden 1 \
+     --out_prefix out/interval_h1 \
+     --snapshot_every 10
+
+   python train_interval_nn.py \
+     --data out/interval.data.tsv \
+     --hidden 2 \
+     --out_prefix out/interval_h2 \
+     --snapshot_every 10
+
+   python train_interval_nn.py \
+     --data out/interval.data.tsv \
+     --hidden 3 \
+     --out_prefix out/interval_h3 \
+     --snapshot_every 10
+   ```
+
+2. Retrain this model with tanh, relu, and identity as the activation
+   functions. Which of these converges, and which doesn't? For whichever one
+   fails, why? 
+
+   ```bash
+   python src/train_interval_nn.py \
+     --data out/interval.data.tsv \
+     --hidden 2 \
+     --activation sigmoid  \
+     --out_prefix out/interval_sigmoid  \
+     --snapshot_every 10
+
+   python src/train_interval_nn.py \
+     --data out/interval.data.tsv \
+     --hidden 2 \
+     --activation tanh \
+     --out_prefix out/interval_tanh \
+     --snapshot_every 10
+
+   python src/train_interval_nn.py \
+     --data out/interval.data.tsv \
+     --hidden 2 \
+     --activation relu \
+     --out_prefix out/interval_relu \
+     --snapshot_every 10
+
+   python src/train_interval_nn.py \
+     --data out/interval.data.tsv \
+     --hidden 2 \
+     --activation identity \
+     --out_prefix out/interval_identity \
+     --snapshot_every 10
+   ```
