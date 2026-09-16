@@ -19,7 +19,7 @@ learns these parameters through training, where large amounts of data are
 passed through the network and individual weights and biases are updated based
 on how close the prediction is to the target answer.
 
-| Neural netowrk | Digital neuron |
+| Neural network | Digital neuron |
 |-|-|
 | <img src="img/cartoons/small_nn-1.png"> | <img src="img/cartoons/neuron_model-1.png">
 <details>
@@ -259,26 +259,55 @@ python src/plot_interval_training.py \
 #### Infrence
 
 With a trained model, we can use the weights to make infrences on any value of
-$x$. By taking the weights at vairous epochs, we can watch the model converge.
+$x$.
+
+<details>
+
+```bash
+python src/interval_nn_inference.py \
+    --h_w 3.246 -4.748 \
+    --h_b -12.963 9.216 \
+    --out_v -12.48 -12.286 \
+    --out_b 5.840 \
+    --x $(seq -0.5 0.5 6.5)
+activation=sigmoid
+     x      h1      h2  P(x in interval)  prediction
+ -0.50   0.000   1.000             0.002  0
+  0.00   0.000   1.000             0.002  0
+  0.50   0.000   0.999             0.002  0
+  1.00   0.000   0.989             0.002  0
+  1.50   0.000   0.890             0.006  0
+  2.00   0.002   0.430             0.630  1
+  2.50   0.008   0.066             0.993  1
+  3.00   0.038   0.007             0.995  1
+  3.50   0.168   0.001             0.977  1
+  4.00   0.505   0.000             0.386  0
+  4.50   0.838   0.000             0.010  0
+  5.00   0.963   0.000             0.002  0
+  5.50   0.993   0.000             0.001  0
+  6.00   0.999   0.000             0.001  0
+  6.50   1.000   0.000             0.001  0
+ 
+```
+
+</details>
+
+By taking the weights at vairous epochs, we can watch the model converge.
+
 
 | Epoch 1 | Epoch 100 | Epoch 200 | Epoch 300 |
 |-|-|-|-|
 | <img src="img/echo_10_infrence.png"> | <img src="img/echo_100_infrence.png"> | <img src="img/echo_200_infrence.png"> | <img src="img/echo_300_infrence.png"> |
 
-```bash
-cat out/interval.params.tsv \
-| csvgrep -K 1 -t -c epoch -r '^10$' \
-| csvcut -c h1_w,h2_w,h1_b,h2_b,out_v1,out_v2,out_b \
-| csvformat -T 
-h1_w	h2_w	h1_b	h2_b	out_v1	out_v2	out_b
-0.10098444	0.23653835	-0.83474404	-0.8337441	-0.3812346	-0.23613217	-0.605996
+<details>
 
+```bash
 
 for epoch in 10 100  200 300; do
     params=($(cat out/interval.params.tsv \
     | csvgrep -K 1 -t -c epoch -r "^${epoch}$" \
     | csvcut -c h1_w,h2_w,h1_b,h2_b,out_v1,out_v2,out_b \
-    | csvformat -T \
+    | csvformat -T \src/interval_nn_inference.py
     | tail -n 1 ))
 
     python src/interval_nn_inference.py \
@@ -297,29 +326,5 @@ for epoch in 10 100  200 300; do
         -x X -y "P(X in interval)" \
         --title "Epoch ${epoch}"
 done
-
-
-params=($(cat out/interval.params.tsv \
-| csvgrep -K 1 -t -c epoch -r '^10$' \
-| csvcut -c h1_w,h2_w,h1_b,h2_b,out_v1,out_v2,out_b \
-| csvformat -T \
-| tail -n 1 ))
-echo "${params[0]}"
-
-python src/interval_nn_inference.py \
-    --h_w "${params[0]}" "${params[1]}" \
-    --h_b "${params[2]}" "${params[3]}" \
-    --out_v "${params[4]}" "${params[5]}" \
-    --out_b "${params[6]}" \
-    --x $(seq -0.5 0.02 6.5) \
-| tail -n +3 \
-| awk '{print $1, $4}' \
-| python3 src/plot_line.py \
-    -o img/echo_10_infrence.png \
-    --line_style "-" \
-    --height 2 \
-    --width 4 \
-    -x X -y "P(X in interval)" \
-    --title "Epoch 10"
-
 ```
+</details>
