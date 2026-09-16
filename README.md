@@ -215,7 +215,7 @@ pdftoppm \
     - 1 Output Bias (`out_b`): The baseline offset for the final classification
       layer.
 
-### Training metris
+#### Training metris
 - Loss: How far off the predictions are from the true targets. Here we use
    Binary Cross-Entropy Loss. Binary indicates a 2-class classification problem
    (in interval or not), and Cross-Entropy is a family of loss functions that
@@ -226,6 +226,7 @@ pdftoppm \
 - Accuracy (acc): The proportion of samples correctly identified as inside or
   outside the target interval.
 
+#### Training
 
 Over 400 epochs, the model shifts from stagnation to strong convergence. For
 the first 120 epochs, the model makes minimal progress with accuracy staying
@@ -255,15 +256,70 @@ python src/plot_interval_training.py \
 
 </details>
 
-## Infrence
+#### Infrence
+
+With a trained model, we can use the weights to make infrences on any value of
+$x$. By taking the weights at vairous epochs, we can watch the model converge.
+
+| Epoch 1 | Epoch 100 | Epoch 200 | Epoch 300 |
+|-|-|-|-|
+| <img src="img/echo_10_infrence.png"> | <img src="img/echo_100_infrence.png"> | <img src="img/echo_200_infrence.png"> | <img src="img/echo_300_infrence.png"> |
 
 ```bash
-python src/interval_nn_inference.py \
-    --h_w 3.246 -4.748 \
-    --h_b -12.963 9.216 \
-    --out_v -12.481 -12.286 \
-    --out_b 5.840 \
-    --x 0.5 1.9 2.1 3.0 3.9 4.1 5.5
-```
+cat out/interval.params.tsv \
+| csvgrep -K 1 -t -c epoch -r '^10$' \
+| csvcut -c h1_w,h2_w,h1_b,h2_b,out_v1,out_v2,out_b \
+| csvformat -T 
+h1_w	h2_w	h1_b	h2_b	out_v1	out_v2	out_b
+0.10098444	0.23653835	-0.83474404	-0.8337441	-0.3812346	-0.23613217	-0.605996
 
-## Train 
+
+for epoch in 10 100  200 300; do
+    params=($(cat out/interval.params.tsv \
+    | csvgrep -K 1 -t -c epoch -r "^${epoch}$" \
+    | csvcut -c h1_w,h2_w,h1_b,h2_b,out_v1,out_v2,out_b \
+    | csvformat -T \
+    | tail -n 1 ))
+
+    python src/interval_nn_inference.py \
+        --h_w "${params[0]}" "${params[1]}" \
+        --h_b "${params[2]}" "${params[3]}" \
+        --out_v "${params[4]}" "${params[5]}" \
+        --out_b "${params[6]}" \
+        --x $(seq -0.5 0.02 6.5) \
+    | tail -n +3 \
+    | awk '{print $1, $4}' \
+    | python3 src/plot_line.py \
+        -o img/echo_${epoch}_infrence.png \
+        --line_style "-" \
+        --height 2 \
+        --width 4 \
+        -x X -y "P(X in interval)" \
+        --title "Epoch ${epoch}"
+done
+
+
+params=($(cat out/interval.params.tsv \
+| csvgrep -K 1 -t -c epoch -r '^10$' \
+| csvcut -c h1_w,h2_w,h1_b,h2_b,out_v1,out_v2,out_b \
+| csvformat -T \
+| tail -n 1 ))
+echo "${params[0]}"
+
+python src/interval_nn_inference.py \
+    --h_w "${params[0]}" "${params[1]}" \
+    --h_b "${params[2]}" "${params[3]}" \
+    --out_v "${params[4]}" "${params[5]}" \
+    --out_b "${params[6]}" \
+    --x $(seq -0.5 0.02 6.5) \
+| tail -n +3 \
+| awk '{print $1, $4}' \
+| python3 src/plot_line.py \
+    -o img/echo_10_infrence.png \
+    --line_style "-" \
+    --height 2 \
+    --width 4 \
+    -x X -y "P(X in interval)" \
+    --title "Epoch 10"
+
+```
